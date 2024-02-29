@@ -4,5 +4,6 @@ export const Query = `
         usuario(id: ID): [Usuario]
         paises: [Pais]
         pais(id: ID): Pais
+        name(NombreUsuario: String): String
     }
 `;

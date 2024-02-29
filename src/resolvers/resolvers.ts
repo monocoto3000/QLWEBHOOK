@@ -1,7 +1,7 @@
 import { getPaises, getPais, postPais, putPais, deletePais } from "../repository/country.repository";
-import { getUsuario, getUsuarios, createUsuario, updateUsuario, deleteUsuario, getPaisesUsuarios } from "../repository/user.repository";
+import { getUsuario, getUsuarios, createUsuario, updateUsuario, deleteUsuario, getPaisesUsuarios, getUsuarioByName } from "../repository/user.repository";
 import { notifyDiscord } from "../service/DiscordEventNotification/DiscordNotify";
-import { verifyUserCredentials } from "../middleware/auth.middleware";
+import { verifyUserCredentials, generateToken } from "../middleware/auth.middleware";
 
 export const resolvers = {
     Query: {
@@ -29,14 +29,15 @@ export const resolvers = {
             };
             return newRes;
         },
+        name: (_root: any, { NombreUsuario }: any) => getUsuarioByName(NombreUsuario),
     },
     Mutation: {
         crearUsuario: (_root: any, { input }: any) => {
             createUsuario(input.NombreUsuario, input.Contrasena, input.Pais_id),
-            notifyDiscord("Se ha registrado un nuevo usuario: " + input.NombreUsuario + "  y pertence al pais: " + getPais(input.Pais_id))
+            notifyDiscord("¡Se ha registrado un nuevo usuario! Dale la bienvenida a " + input.NombreUsuario)
         },
         actualizarUsuario: (_root: any, { id, input }: any) =>
-            updateUsuario(id, input.NombreUsuario, input.Contrasena, input.Pais_id),
+        updateUsuario(id, input.NombreUsuario, input.Contrasena, input.Pais_id),
         eliminarUsuario: (_root: any, { id }: any) => deleteUsuario(id),
         crearPais: (_root: any, { input }: any) => {
             postPais(
@@ -45,7 +46,7 @@ export const resolvers = {
                 input.capital,
                 input.idioma_principal
             ),
-            notifyDiscord("Se ha creado un nuevo pais! Se llama: " + input.nombre)
+                notifyDiscord("Se ha creado un nuevo pais! Se llama: " + input.nombre)
         },
         actualizarPais: (_root: any, { id, input }: any) => {
             putPais(
@@ -55,14 +56,15 @@ export const resolvers = {
                 input.idioma_principal,
                 id
             ),
-            notifyDiscord("Se ha modificado los datos de " + input.nombre)
+                notifyDiscord("Se ha modificado los datos de " + input.nombre)
         },
         eliminarPais: (_root: any, { id }: any) => deletePais(id),
-        login: async (_root: any, { id, input }: any) => {
+        login: async (_root: any, { input }: any) => {
             try {
               const user = await verifyUserCredentials(input.NombreUsuario, input.Contrasena);              
               if (user) {
                 const token = generateToken(user);
+                notifyDiscord(input.NombreUsuario + " ha inciado sesión")
                 return { token };
               } else {
                 throw new Error('Credenciales inválidas');

@@ -7,19 +7,15 @@ export const getUsuarios = () => new Promise((resolve, reject) => {
         .catch((error) => reject(error));
 });
 
-// export const getUsuarioByName = (NombreUsuario: string) => new Promise((resolve, reject) => {
-//     const consulta = "SELECT * FROM usuariosds WHERE NombreUsuario = ?";
-//     db.query(consulta, [NombreUsuario])
-//         .then(([rows]) => resolve(rows[0]))
-//         .catch((error) => reject(error))
-// });
-
-// export const getUsuarioContrasena = (NombreUsuario: string) => new Promise((resolve, reject) => {
-//     const consulta = "SELECT Contrasena FROM usuariosds WHERE NombreUsuario = ?";
-//     db.query(consulta, [NombreUsuario])
-//         .then(([rows]) => resolve(rows[0]))
-//         .catch((error) => reject(error))
-// });
+export const getUsuarioByName = (NombreUsuario: string) => new Promise(() => {
+    try {
+        const consulta = "SELECT * FROM usuariosds WHERE NombreUsuario = ?";
+        const result: any = db.execute(consulta, [NombreUsuario]);
+        return result[0].length > 0 ? result[0][0] : null;
+    } catch (err: any) {
+        throw new Error(err);
+    }
+});
 
 export const getUsuario = (id: number) => new Promise((resolve, reject) => {
     const consulta = "SELECT * FROM usuariosds WHERE id_usuarios = ?";
@@ -28,16 +24,16 @@ export const getUsuario = (id: number) => new Promise((resolve, reject) => {
         .catch((error) => reject(error));
 });
 
-export const createUsuario = (NombreUsuario: string, Contrasena:string, Pais_id:number   ) => new Promise((resolve, reject) => {
+export const createUsuario = (NombreUsuario: string, Contrasena: string, Pais_id: number) => new Promise((resolve, reject) => {
     const consulta = "INSERT INTO usuariosds (NombreUsuario, Contrasena, Pais_id) VALUES (?,?,?)";
     db.query(consulta, [NombreUsuario, Contrasena, Pais_id])
         .then(([result]) => resolve(result))
         .catch((error) => reject(error));
 });
 
-export const updateUsuario = (id: number, NombreUsuario: string, Contrasena:string, Pais_id:number  ) => new Promise((resolve, reject) => {
+export const updateUsuario = (id: number, NombreUsuario: string, Contrasena: string, Pais_id: number) => new Promise((resolve, reject) => {
     const consulta = "UPDATE usuariosds SET NombreUsuario = ? , Contrasena = ? ,Pais_id = ? WHERE id_usuarios = ?";
-    db.query(consulta, [NombreUsuario, Contrasena, Pais_id , id])
+    db.query(consulta, [NombreUsuario, Contrasena, Pais_id, id])
         .then(([result]) => resolve(result))
         .catch((error) => reject(error));
 });

@@ -1,13 +1,11 @@
 export const Mutacion = `
     type Mutation {
-        crearUsuario(input: UsuarioInput): Usuario
+        crearUsuario(input: UsuarioInput): String
         actualizarUsuario(id: ID, input: UsuarioInput): Usuario
         eliminarUsuario(id: ID): Usuario
         crearPais(input: PaisInput): Pais
         actualizarPais(id: ID, input: PaisInput): Pais
         eliminarPais(id: ID): Pais
-        verifyUserCredentials(input: UsuarioInput): Usuario
-        getUsuarioByName(input: UsuarioInput): Usuario
-        getUsuarioContrasena(input: UsuarioInput): Usuario
+        login(input: UsuarioInput): String
     }
 `;
