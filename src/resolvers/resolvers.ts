@@ -1,11 +1,12 @@
 import { getPaises, getPais, postPais, putPais, deletePais } from "../repository/country.repository";
 import { getUsuario, getUsuarios, createUsuario, updateUsuario, deleteUsuario, getPaisesUsuarios, getUsuarioByName } from "../repository/user.repository";
 import { notifyDiscord } from "../service/DiscordEventNotification/DiscordNotify";
-import { verifyUserCredentials, generateToken } from "../middleware/auth.middleware";
+import { UserEntity } from "../schema/entities/user.entity";
+import { loginService } from "../middleware/auth.middleware";
 
 export const resolvers = {
     Query: {
-        usuarios: () => getUsuarios(),
+        usuarios: (_root: any, { pagina, resultadosPorPagina }: any) => getUsuarios(pagina, resultadosPorPagina),
         usuario: (_root: any, { id }: any) => getUsuario(id),
         paises: async () => {
             const resPaises: any = await getPaises();
@@ -34,10 +35,10 @@ export const resolvers = {
     Mutation: {
         crearUsuario: (_root: any, { input }: any) => {
             createUsuario(input.NombreUsuario, input.Contrasena, input.Pais_id),
-            notifyDiscord("¡Se ha registrado un nuevo usuario! Dale la bienvenida a " + input.NombreUsuario)
+                notifyDiscord("¡Se ha registrado un nuevo usuario! Dale la bienvenida a " + input.NombreUsuario)
         },
         actualizarUsuario: (_root: any, { id, input }: any) =>
-        updateUsuario(id, input.NombreUsuario, input.Contrasena, input.Pais_id),
+            updateUsuario(id, input.NombreUsuario, input.Contrasena, input.Pais_id),
         eliminarUsuario: (_root: any, { id }: any) => deleteUsuario(id),
         crearPais: (_root: any, { input }: any) => {
             postPais(
@@ -59,19 +60,14 @@ export const resolvers = {
                 notifyDiscord("Se ha modificado los datos de " + input.nombre)
         },
         eliminarPais: (_root: any, { id }: any) => deletePais(id),
-        login: async (_root: any, { input }: any) => {
+        login: async (_root: any, args: UserEntity) => {
             try {
-              const user = await verifyUserCredentials(input.NombreUsuario, input.Contrasena);              
-              if (user) {
-                const token = generateToken(user);
-                notifyDiscord(input.NombreUsuario + " ha inciado sesión")
-                return { token };
-              } else {
-                throw new Error('Credenciales inválidas');
-              }
-            } catch (error) {
-              throw new Error('Error al iniciar sesión');
+                const { NombreUsuario, Contrasena } = args;
+                const token = await loginService(NombreUsuario, Contrasena);
+                return token;
+            } catch (err: any) {
+                return err;
             }
-          },
+        },
     },
 }

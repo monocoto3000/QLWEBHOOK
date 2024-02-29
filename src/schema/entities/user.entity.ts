@@ -6,3 +6,10 @@ export const Usuarios = `
         Pais_id: ID
     }
 `;
+
+export interface UserEntity {
+    id_usuarios?: number | null
+    NombreUsuario: string
+    Contrasena: string
+    Pais_id?: number | null
+}

@@ -6,6 +6,6 @@ export const Mutacion = `
         crearPais(input: PaisInput): Pais
         actualizarPais(id: ID, input: PaisInput): Pais
         eliminarPais(id: ID): Pais
-        login(input: UsuarioInput): String
+        login(NombreUsuario : String!, Contrasena : String!): String
     }
 `;
